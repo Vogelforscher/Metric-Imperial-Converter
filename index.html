@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metric ↔ Imperial Converter</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .converter {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px;
+      margin-top: 5px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+    .convert-btn {
+      background: #4CAF50;
+      color: white;
+    }
+    .convert-btn:hover {
+      background: #45a049;
+    }
+    .copy-btn {
+      background: #2196F3;
+      color: white;
+    }
+    .copy-btn:hover {
+      background: #1976D2;
+    }
+    .result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-align: center;
+      word-break: break-word;
+    }
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      .converter { padding: 15px; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Metric ↔ Imperial Converter</h1>
+
+  <div class="converter">
+    <label for="conversionType">Select conversion type:</label>
+    <select id="conversionType" onchange="updateDirection()">
+      <option value="length">Length</option>
+      <option value="weight">Weight</option>
+      <option value="temperature">Temperature</option>
+      <option value="volume">Volume</option>
+      <option value="area">Area</option>
+      <option value="speed">Speed</option>
+      <option value="pressure">Pressure</option>
+      <option value="energy">Energy</option>
+    </select>
+
+    <label for="direction">Select direction:</label>
+    <select id="direction">
+      <!-- Options werden dynamisch gefüllt -->
+    </select>
+
+    <label for="value">Enter value:</label>
+    <input type="number" id="value" placeholder="e.g. 10">
+
+    <button class="convert-btn" onclick="convert()">Convert</button>
+    <div class="result" id="result"></div>
+    <button class="copy-btn" onclick="copyResult()">📋 Copy result</button>
+  </div>
+
+  <script>
+    const directions = {
+      length: [
+        {text: "Meters → Feet", value: "m_to_ft"},
+        {text: "Feet → Meters", value: "ft_to_m"},
+        {text: "Kilometers → Miles", value: "km_to_mi"},
+        {text: "Miles → Kilometers", value: "mi_to_km"},
+        {text: "Centimeters → Inches", value: "cm_to_in"},
+        {text: "Inches → Centimeters", value: "in_to_cm"}
+      ],
+      weight: [
+        {text: "Kilograms → Pounds", value: "kg_to_lb"},
+        {text: "Pounds → Kilograms", value: "lb_to_kg"}
+      ],
+      temperature: [
+        {text: "Celsius → Fahrenheit", value: "c_to_f"},
+        {text: "Fahrenheit → Celsius", value: "f_to_c"}
+      ],
+      volume: [
+        {text: "Liters → Gallons", value: "l_to_gal"},
+        {text: "Gallons → Liters", value: "gal_to_l"}
+      ],
+      area: [
+        {text: "Square meters → Square feet", value: "m2_to_ft2"},
+        {text: "Square feet → Square meters", value: "ft2_to_m2"}
+      ],
+      speed: [
+        {text: "km/h → mph", value: "kmh_to_mph"},
+        {text: "mph → km/h", value: "mph_to_kmh"}
+      ],
+      pressure: [
+        {text: "Bar → PSI", value: "bar_to_psi"},
+        {text: "PSI → Bar", value: "psi_to_bar"}
+      ],
+      energy: [
+        {text: "Joules → Calories", value: "j_to_cal"},
+        {text: "Calories → Joules", value: "cal_to_j"}
+      ]
+    };
+
+    function updateDirection() {
+      const type = document.getElementById("conversionType").value;
+      const directionSelect = document.getElementById("direction");
+      directionSelect.innerHTML = "";
+      directions[type].forEach(d => {
+        const option = document.createElement("option");
+        option.value = d.value;
+        option.text = d.text;
+        directionSelect.appendChild(option);
+      });
+    }
+
+    // Initiale Richtungen laden
+    updateDirection();
+
+    function convert() {
+      let value = parseFloat(document.getElementById("value").value);
+      let conversion = document.getElementById("direction").value;
+      let result = "";
+
+      if (isNaN(value)) {
+        result = "❌ Please enter a number!";
+      } else {
+        switch (conversion) {
+          case "m_to_ft": result = (value * 3.28084).toFixed(2) + " ft"; break;
+          case "ft_to_m": result = (value / 3.28084).toFixed(2) + " m"; break;
+          case "km_to_mi": result = (value * 0.621371).toFixed(2) + " mi"; break;
+          case "mi_to_km": result = (value / 0.621371).toFixed(2) + " km"; break;
+          case "cm_to_in": result = (value * 0.393701).toFixed(2) + " in"; break;
+          case "in_to_cm": result = (value / 0.393701).toFixed(2) + " cm"; break;
+          case "kg_to_lb": result = (value * 2.20462).toFixed(2) + " lb"; break;
+          case "lb_to_kg": result = (value / 2.20462).toFixed(2) + " kg"; break;
+          case "c_to_f": result = ((value * 9/5) + 32).toFixed(2) + " °F"; break;
+          case "f_to_c": result = ((value - 32) * 5/9).toFixed(2) + " °C"; break;
+          case "l_to_gal": result = (value * 0.264172).toFixed(2) + " gal"; break;
+          case "gal_to_l": result = (value / 0.264172).toFixed(2) + " L"; break;
+          case "m2_to_ft2": result = (value * 10.7639).toFixed(2) + " ft²"; break;
+          case "ft2_to_m2": result = (value / 10.7639).toFixed(2) + " m²"; break;
+          case "kmh_to_mph": result = (value * 0.621371).toFixed(2) + " mph"; break;
+          case "mph_to_kmh": result = (value / 0.621371).toFixed(2) + " km/h"; break;
+          case "bar_to_psi": result = (value * 14.5038).toFixed(2) + " PSI"; break;
+          case "psi_to_bar": result = (value / 14.5038).toFixed(2) + " bar"; break;
+          case "j_to_cal": result = (value * 0.239006).toFixed(2) + " cal"; break;
+          case "cal_to_j": result = (value / 0.239006).toFixed(2) + " J"; break;
+        }
+      }
+
+      document.getElementById("result").innerText = result;
+    }
+
+    function copyResult() {
+      let resultText = document.getElementById("result").innerText;
+      if (resultText) {
+        navigator.clipboard.writeText(resultText).then(() => {
+          alert("✅ Copied: " + resultText);
+        });
+      } else {
+        alert("❌ No result to copy!");
+      }
+    }
+  </script>
+</body>
+</html>
